@@ -1,8 +1,66 @@
 ;
 (function(global, struct) {
-
-    function extend() {
-
+    var defaults = {
+        circle:{
+            default:{
+                lineWidth:3,
+                strokeStyle:'#50A2E9'
+            },
+            wrong:{
+                lineWidth:3,
+                strokeStyle:'#D90106'
+            },
+            right:{
+                lineWidth:3,
+                strokeStyle:'#21864C'
+            }
+        },
+        line:{
+            default:{
+                lineWidth:3,
+                strokeStyle:'#50A2E9'
+            },
+            wrong:{
+                lineWidth:3,
+                strokeStyle:'#D90106'
+            },
+            right:{
+                lineWidth:3,
+                strokeStyle:'#21864C'
+            }
+        },
+        dot:{
+            default:{
+                size:8,
+                fillStyle:'#50A2E9'
+            },
+            wrong:{
+                size:8,
+                fillStyle:'#D90106'
+            },
+            right:{
+                size:8,
+                fillStyle:'#21864C'
+            }
+        }
+ };
+    function extendDeep() {
+        var target = arguments[0];
+        var len = arguments.length;
+        for(var i = 1;i<len;i++){
+            var source = arguments[i];
+            for(var key in source){
+                if(source.hasOwnProperty(key) && source[key] !== undefined){
+                    if(typeof source[key] === 'object'){//
+                        if(target[key] === undefined) target[key] = {};
+                        extendDeep(target[key],source[key]);
+                    }else{
+                        target[key] = source[key];
+                    }
+                }
+            }
+        }
+        return target;
     }
 
     function getOffsetRect(elem) {
@@ -43,7 +101,9 @@
             this.size = this.container.offsetWidth - parseInt(getStyle(this.container, 'borderLeftWidth')) - parseFloat(getStyle(this.container, 'borderRightWidth'));
             this.isDown = false;
             this.touchId = false;
-            this.config = { lineWidth: 3, pointSize: 8 };
+            this.disable = false;
+            this.state = 'default';
+            this.config = extendDeep({},defaults,config);
             this.events = {};
             this.cList = [];
             this.sList = [];
@@ -53,8 +113,8 @@
             this.canvas.height = this.size;
             this.container.appendChild(this.canvas);
             this.ctx = this.canvas.getContext('2d');
-            this.cr = this.size / 8 - this.config.lineWidth;
-            this.cm = this.size / 4;
+            this.cr = (this.size / 8 - this.config.circle[this.state].lineWidth)*this.config.circle[this.state].sizeScale;
+            this.cm = this.size - (this.cr + this.config.circle[this.state].lineWidth)*6;
             this.drawCircle();
 
             //touch事件
@@ -69,14 +129,15 @@
 
         },
         drawCircle: function() {
-            this.ctx.strokeStyle = '#50A2E9';
-            this.ctx.lineWidth = this.config.lineWidth;
+            this.ctx.strokeStyle = this.config.circle.default.strokeStyle;
+            this.ctx.lineWidth = this.config.circle.default.lineWidth;
+            this.cList = [];
             var count = [0, 1, 2];
             this.ctx.beginPath();
             count.forEach(function(row) {
                 count.forEach(function(column) {
-                    var x = (this.cr + this.config.lineWidth + this.cm / 6) * (2 * column + 1);
-                    var y = (this.cr + this.config.lineWidth) * (2 * row + 1) + 2 * row * this.cm / 6;
+                    var x = (this.cr + this.config.circle[this.state].lineWidth + this.cm / 6) * (2 * column + 1);
+                    var y = (this.cr + this.config.circle[this.state].lineWidth) * (2 * row + 1) + 2 * row * this.cm / 6;
                     this.cList.push(new Point(x, y, 3 * row + column + 1));
                     this.ctx.moveTo(x + this.cr, y);
                     this.ctx.arc(x, y, this.cr, 0, 2 * Math.PI);
@@ -104,22 +165,33 @@
                 this.isRedraw = false;
             }
             var lastPoint = this.sList[this.sList.length - 1];
-            this.ctx.beginPath();
-            this.ctx.moveTo(lastPoint.x, lastPoint.y);
-            this.ctx.lineTo(evt.elementX, evt.elementY);
-            this.ctx.stroke();
+            if(lastPoint){
+                this.ctx.strokeStyle = this.config.line[this.state].strokeStyle;
+                this.ctx.beginPath();
+                this.ctx.moveTo(lastPoint.x, lastPoint.y);
+                this.ctx.lineTo(evt.elementX, evt.elementY);
+                this.ctx.stroke();
+            }
 
         },
         drawPointAndLine: function() {
-            this.ctx.beginPath();
-            this.ctx.fillStyle = '#50A2E9';
+            this.ctx.fillStyle = this.config.dot[this.state].fillStyle;
+            this.ctx.strokeStyle = this.config.circle[this.state].strokeStyle;
 
             for (var i = 0; i < this.sList.length; i++) {
                 var point = this.sList[i];
-                this.ctx.moveTo(point.x + this.config.pointSize, point.y);
-                this.ctx.arc(point.x, point.y, this.config.pointSize, 0, 2 * Math.PI);
+                this.ctx.beginPath();
+                this.ctx.moveTo(point.x + this.cr, point.y);
+                this.ctx.beginPath();
+                this.ctx.lineWidth = 3;
+                this.ctx.arc(point.x, point.y, this.cr, 0, 2 * Math.PI);
+                this.ctx.stroke();
+                this.ctx.beginPath();
+                this.ctx.arc(point.x, point.y, this.config.dot[this.state].size, 0, 2 * Math.PI);
                 this.ctx.fill();
+
                 if (this.sList.length >= 2 && i >= 1) {
+                    this.ctx.strokeStyle = this.config.line[this.state].strokeStyle;
                     var prePoint = this.sList[i - 1];
                     this.ctx.moveTo(prePoint.x, prePoint.y);
                     this.ctx.lineTo(point.x, point.y);
@@ -131,32 +203,36 @@
             this.backImg = this.ctx.getImageData(0, 0, this.size, this.size);
 
         },
-        drawLine: function() {
-
-        },
         handleDown: function(e) {
             e.preventDefault();
-            var evt = this.fixEvent(e);
-            if (!this.isDown) {
-                this.touchId = evt.identifier;
-                this.isDown = true;
+            if(!this.disable){
+                var evt = this.fixEvent(e);
+                if (!this.isDown) {
+                    this.touchId = evt.identifier;
+                    this.isDown = true;
+                }
             }
         },
         handleUp: function(e) {
             e.preventDefault();
-            var evt = this.fixEvent(e);
-            if (evt.identifier === this.touchId) {
-                this.isDown = false;
-                this.ctx.clearRect(0, 0, this.size, this.size);
-                this.ctx.putImageData(this.backImg, 0, 0);
-                this.emit('complete',this.getPassword());
+            if(!this.disable){
+                var evt = this.fixEvent(e);
+                if (evt.identifier === this.touchId) {
+                    this.isDown = false;
+                    this.ctx.clearRect(0, 0, this.size, this.size);
+                    this.ctx.putImageData(this.backImg, 0, 0);
+                    this.disable = true;
+                    this.emit('complete',this.getPassword());
+                }
             }
         },
         handleMove: function(e) {
             e.preventDefault();
-            var evt = this.fixEvent(e);
-            if (this.isDown && evt.identifier === this.touchId) {
-                this.draw(evt);
+            if(!this.disable){
+                var evt = this.fixEvent(e);
+                if (this.isDown && evt.identifier === this.touchId) {
+                    this.draw(evt);
+                }
             }
         },
         checkIn: function(evt) {
@@ -192,16 +268,29 @@
                 return false;
             }
             var args = arguments;
-            console.log(arguments);
             this.events[name].forEach(function(fn){
                 fn.apply(this,[].slice.call(args,1));
             }.bind(this));
         },
         setRight:function(){
-            
+            this.state = 'right';
+            this.ctx.clearRect(0,0,this.size,this.size);
+            this.drawCircle();
+            this.drawPointAndLine();
         },
         setWrong:function(){
-            
+            this.state = 'wrong';
+            this.ctx.clearRect(0,0,this.size,this.size);
+            this.drawCircle();
+            this.drawPointAndLine();
+        },
+        reset:function(){
+            this.state = 'default';
+            this.disable = false;
+            this.sList = [];
+            this.ctx.clearRect(0,0,this.size,this.size);
+            this.drawCircle();
+
         }
     }
 
