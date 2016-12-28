@@ -1,9 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>gesture.password light demo</title>
+	<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="css/index.css">
 </head>
-<body>
+<body class="light">
+<div id="wrap">
+	<div class="head">
+	<p>
+		请输入图形密码
+	</p>
+	<p id="message">
+		密码错误
+	</p>
+	
+</div>
+<div id="gesturePassword" class="middle"></div>
+<div class="bottom"></div>
+</div>
 
+<script src='js/gesture.password.js'></script>
+<script>
+	var p = new GesturePassword('gesturePassword',{
+		circle:{
+			sizeScale:0.9,
+			default:{
+               strokeStyle:'#D5DBE8'
+            }
+			},
+		line:{
+      lineWidth:3,
+      default:{
+      	strokeStyle:'#50A2E9'
+      },
+    dot:{
+    	size:8,
+    	default:{
+    		fillStyle:'#50A2E9'
+    	}
+    }
+		}
+	});
+
+	p.on('complete',function(result){
+		console.log(result);
+	});
+</script>
 </body>
 </html>
