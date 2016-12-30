@@ -19,14 +19,7 @@
 
 <script src='js/gesture.password.js'></script>
 <script>
-	var p = new GesturePassword('gesturePassword',{
-		circle:{
-			sizeScale:0.9,
-			default:{
-                
-            }
-			}
-	});
+	var p = new GesturePassword('gesturePassword');
 
 	p.on('complete',function(result){
 		console.log(result);

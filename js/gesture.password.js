@@ -170,7 +170,7 @@
 
         },
         drawPointAndLine: function() {
-            
+
 
             for (var i = 0; i < this.sList.length; i++) {
                 var point = this.sList[i];
