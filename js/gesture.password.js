@@ -2,44 +2,39 @@
 (function(global, struct) {
     var defaults = {
         circle:{
+            sizeScale:1,
+            lineWidth:3,
             default:{
-                lineWidth:3,
                 strokeStyle:'#50A2E9'
             },
             wrong:{
-                lineWidth:3,
                 strokeStyle:'#D90106'
             },
             right:{
-                lineWidth:3,
                 strokeStyle:'#21864C'
             }
         },
         line:{
+            lineWidth:3,
             default:{
-                lineWidth:3,
                 strokeStyle:'#50A2E9'
             },
             wrong:{
-                lineWidth:3,
                 strokeStyle:'#D90106'
             },
             right:{
-                lineWidth:3,
                 strokeStyle:'#21864C'
             }
         },
         dot:{
+           size:8,
             default:{
-                size:8,
                 fillStyle:'#50A2E9'
             },
             wrong:{
-                size:8,
                 fillStyle:'#D90106'
             },
             right:{
-                size:8,
                 fillStyle:'#21864C'
             }
         }
@@ -98,7 +93,7 @@
     struct.prototype = {
         constructor: struct,
         init: function(config) {
-            this.size = this.container.offsetWidth - parseInt(getStyle(this.container, 'borderLeftWidth')) - parseFloat(getStyle(this.container, 'borderRightWidth'));
+            this.size = this.container.offsetWidth - parseInt(getStyle(this.container, 'paddingLeft')) - parseInt(getStyle(this.container, 'paddingRight'))  -  parseInt(getStyle(this.container, 'borderLeftWidth')) - parseFloat(getStyle(this.container, 'borderRightWidth'));
             this.isDown = false;
             this.touchId = false;
             this.disable = false;
@@ -113,8 +108,8 @@
             this.canvas.height = this.size;
             this.container.appendChild(this.canvas);
             this.ctx = this.canvas.getContext('2d');
-            this.cr = (this.size / 8 - this.config.circle[this.state].lineWidth)*this.config.circle[this.state].sizeScale;
-            this.cm = this.size - (this.cr + this.config.circle[this.state].lineWidth)*6;
+            this.cr = (this.size / 8 - this.config.circle.lineWidth)*this.config.circle.sizeScale;
+            this.cm = this.size - (this.cr + this.config.circle.lineWidth)*6;
             this.drawCircle();
 
             //touch事件
@@ -130,14 +125,14 @@
         },
         drawCircle: function() {
             this.ctx.strokeStyle = this.config.circle.default.strokeStyle;
-            this.ctx.lineWidth = this.config.circle.default.lineWidth;
+            this.ctx.lineWidth = this.config.circle.lineWidth;
             this.cList = [];
             var count = [0, 1, 2];
             this.ctx.beginPath();
             count.forEach(function(row) {
                 count.forEach(function(column) {
-                    var x = (this.cr + this.config.circle[this.state].lineWidth + this.cm / 6) * (2 * column + 1);
-                    var y = (this.cr + this.config.circle[this.state].lineWidth) * (2 * row + 1) + 2 * row * this.cm / 6;
+                    var x = (this.cr + this.config.circle.lineWidth + this.cm / 6) * (2 * column + 1);
+                    var y = (this.cr + this.config.circle.lineWidth) * (2 * row + 1) + 2 * row * this.cm / 6;
                     this.cList.push(new Point(x, y, 3 * row + column + 1));
                     this.ctx.moveTo(x + this.cr, y);
                     this.ctx.arc(x, y, this.cr, 0, 2 * Math.PI);
@@ -175,24 +170,28 @@
 
         },
         drawPointAndLine: function() {
-            this.ctx.fillStyle = this.config.dot[this.state].fillStyle;
-            this.ctx.strokeStyle = this.config.circle[this.state].strokeStyle;
+            
 
             for (var i = 0; i < this.sList.length; i++) {
                 var point = this.sList[i];
                 this.ctx.beginPath();
                 this.ctx.moveTo(point.x + this.cr, point.y);
-                this.ctx.beginPath();
-                this.ctx.lineWidth = 3;
+
+                this.ctx.lineWidth = this.config.circle.lineWidth;
+                this.ctx.fillStyle = this.config.dot[this.state].fillStyle;
+                this.ctx.strokeStyle = this.config.circle[this.state].strokeStyle;
+
                 this.ctx.arc(point.x, point.y, this.cr, 0, 2 * Math.PI);
                 this.ctx.stroke();
                 this.ctx.beginPath();
-                this.ctx.arc(point.x, point.y, this.config.dot[this.state].size, 0, 2 * Math.PI);
+                this.ctx.arc(point.x, point.y, this.config.dot.size, 0, 2 * Math.PI);
                 this.ctx.fill();
-
+                this.ctx.closePath();
                 if (this.sList.length >= 2 && i >= 1) {
                     this.ctx.strokeStyle = this.config.line[this.state].strokeStyle;
+                    this.ctx.lineWidth = this.config.line[this.state].lineWidth;
                     var prePoint = this.sList[i - 1];
+                    this.ctx.beginPath();
                     this.ctx.moveTo(prePoint.x, prePoint.y);
                     this.ctx.lineTo(point.x, point.y);
                     this.ctx.closePath();
