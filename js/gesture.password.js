@@ -97,6 +97,7 @@
             this.isDown = false;
             this.touchId = false;
             this.disable = false;
+            this.hasMoved = false;
             this.state = 'default';
             this.config = extendDeep({},defaults,config);
             this.events = {};
@@ -170,7 +171,7 @@
 
         },
         drawPointAndLine: function() {
-            
+
 
             for (var i = 0; i < this.sList.length; i++) {
                 var point = this.sList[i];
@@ -220,7 +221,9 @@
                     this.isDown = false;
                     this.ctx.clearRect(0, 0, this.size, this.size);
                     this.ctx.putImageData(this.backImg, 0, 0);
-                    this.disable = true;
+                    if(this.hasMoved){
+                        this.disable = true;
+                    }
                     this.emit('complete',this.getPassword());
                 }
             }
@@ -230,6 +233,7 @@
             if(!this.disable){
                 var evt = this.fixEvent(e);
                 if (this.isDown && evt.identifier === this.touchId) {
+                    this.hasMoved = true;
                     this.draw(evt);
                 }
             }
