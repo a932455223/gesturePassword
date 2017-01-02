@@ -223,8 +223,8 @@
                     this.ctx.putImageData(this.backImg, 0, 0);
                     if(this.hasMoved){
                         this.disable = true;
+                        this.emit('complete',this.getPassword());
                     }
-                    this.emit('complete',this.getPassword());
                 }
             }
         },
