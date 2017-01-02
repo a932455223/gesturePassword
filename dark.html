@@ -3,14 +3,14 @@
 <head>
 	<title>gesture.password dark demo</title>
 	<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,user-scalable=no">
-	<link rel="stylesheet" type="text/css" href="css/index.css">
+	<link rel="stylesheet" type="text/css" href="/css/index.less">
 </head>
 <body class="dark">
 <div id="wrap">
 	<div class="head">
 	<div class="avatar"></div>
 	<p id="message">
-		密码错误
+		滑动手指输入密码
 	</p>
 </div>
 <div id="gesturePassword" class="middle"></div>
@@ -19,10 +19,34 @@
 
 <script src='js/gesture.password.js'></script>
 <script>
-	var p = new GesturePassword('gesturePassword');
-
+	var p = new GesturePassword('gesturePassword'),
+			msg = document.getElementById('message'),password;
 	p.on('complete',function(result){
-		console.log(result);
+		if(password){
+			if(password === result){
+				msg.innerHTML = '密码设置成功';
+				msg.classList.add('right')
+				p.setRight();
+			}else{
+				msg.innerHTML = '两次密码不一致';
+				msg.classList.add('error')
+				p.setWrong();
+			}
+
+			setTimeout(function(){
+					p.reset();
+					msg.innerHTML = '';
+					msg.className = '';
+					password = false;
+				},1500);
+
+		}else{//第一次输入时
+			password = result;
+			msg.innerHTML = '请再次输入密码'
+			setTimeout(function(){
+				p.reset();
+			},500);
+		}
 	});
 </script>
 </body>
