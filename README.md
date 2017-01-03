@@ -17,7 +17,7 @@
 </script>
 ```
 上面代码的显示效果是一个默认样式的手势密码（如上面的示例图片1）。当然，样式可以配置，以便更符合自己的页面的风格。
-下面的配置，上面浅色的截图。
+下面的配置对应上面浅色的截图。
 示例：
 ```javascript
 var gp = new GesturePassword('password',{
@@ -25,19 +25,41 @@ var gp = new GesturePassword('password',{
         sizeScale: 0.9,
         default: {
             strokeStyle: '#D5DBE8'
+        }/*,
+        wrong:{
+            strokeStyle:'#D90106'
+        },
+        right:{
+            strokeStyle:'#21864C'
         }
+        */
+
     },
     line: {
         lineWidth: 3,
         default: {
             strokeStyle: '#50A2E9'
+        }/*,
+        wrong:{
+            strokeStyle:'#D90106'
+        },
+        right:{
+            strokeStyle:'#21864C'
         }
+        */
     },
     dot: {
         size: 8,
         default: {
             fillStyle: '#50A2E9'
+        }/*,
+        wrong:{
+            fillStyle:'#D90106'
+        },
+        right:{
+            fillStyle:'#21864C'
         }
+        */
     }
     }
 });
@@ -64,7 +86,7 @@ config:
 }
 ```
 config中的`circle`对应空心圆，`line`对应手指滑动时候那条线，`dot`对应园中心那个实心点。
-`GesturePassword`内部共有三个状态：`default`，`right`，`wrong`，上面的示例只配置了`default`状态下的样式。顾名思义，`right`是配置当状态切换成right时的样式，`wrong`是配置当状态切换成wrong时候的样式。
+`GesturePassword`内部共有三个状态：`default`，`right`，`wrong`，上面的示例只配置了`default`状态下的样式。顾名思义，`right`是配置当状态切换成right时的样式，`wrong`是配置当状态切换成wrong时候的样式。上面示例中注释掉的部分是默认配置，目前能配置的只是颜色，即当调用`setRight`，`setWrong`方法后显示的颜色。
 #### 密码
 密码从上到下，从左到右依次是数字1-9。如上面的【示例图片1】对应的密码是：`12357`。
 #### 方法
