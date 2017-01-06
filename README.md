@@ -8,6 +8,10 @@
 2. 灵活的样式配置
 3. 没有其他依赖
 
+## example
+1.[example1](http://simon-du.me/gesturePassword/dark.html)
+
+1.[example2](http://simon-du.me/gesturePassword/light.html)
 ## useage
 ```html
 <div id="password"></div>
@@ -65,6 +69,8 @@ var gp = new GesturePassword('password',{
 });
 ```
 上面的代码出现的效果：
+
+【示例图片2】
 
 ![浅色截图](/images/light.png)
 ```javascript
