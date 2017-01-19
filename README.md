@@ -8,6 +8,8 @@
 2. 灵活的样式配置
 3. 没有其他依赖
 
+此外还有一个微信小程序的版本 [小程序版本](https://github.com/a932455223/wxGesturePassword) 供大家使用。
+
 ## example
 1.[example1](http://simon-du.me/gesturePassword/dark.html)
 
