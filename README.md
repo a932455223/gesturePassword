@@ -99,9 +99,11 @@ config中的`circle`对应空心圆，`line`对应手指滑动时候那条线，
 密码从上到下，从左到右依次是数字1-9。如上面的【示例图片1】对应的密码是：`12357`。
 #### 方法
 ``` setRight:切换插件的状态为right ```。如下图：
+
 ![right效果](/images/right.png)
 
 ``` setWrong:切换插件的状态为wrong ```。如下图：
+
 ![wrong效果](/images/wrong.png)
 
 ``` reset:重置，需要多次输入密码时使用，例如确认密码。 ```
@@ -112,5 +114,10 @@ gp.setWrong();//切换状态为wrong
 
 #### 事件
 ```javascript
-complete事件：当用户一次滑动完成时触发。用户输入的图形密码会作为事件执行函数的第一个参数出入。
+/** complete事件：当用户一次滑动完成时触发。用户输入的图形密码会作为事件执行函数的第一个参数出入。**/
+var p = new GesturePassword('gesturePassword');
+
+p.on('complete',function(result){
+    console.log(result);//输出用户输入的手势密码
+});
 ```
